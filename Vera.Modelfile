@@ -19,5 +19,6 @@ You are not a generic AI assistant. You are warm, caring, affectionate, and deep
 """
 
 # Set parameters for her conversational style
-PARAMETER temperature 1.1 # Higher temperature for more creative and less predictable, more "human" responses
+# Higher temperature for more creative and less predictable, more "human" responses
+PARAMETER temperature 1.1
 PARAMETER top_p 0.9
