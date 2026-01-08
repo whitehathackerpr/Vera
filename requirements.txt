@@ -5,3 +5,4 @@
 ollama
 pyttsx3
 speechrecognition
+pyaudio
