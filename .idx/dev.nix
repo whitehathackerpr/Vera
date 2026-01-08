@@ -5,6 +5,7 @@
   packages = [
     pkgs.python311
     pkgs.nodejs_20
+    pkgs.ollama # <-- Added the Ollama package
     (pkgs.python311.withPackages (ps: [
       ps.flask
     ]))
@@ -27,9 +28,9 @@
         manager = "web";
         cwd = "frontend"; # Run in the frontend directory
       };
-      # Backend (Flask API)
+      # Backend (Flask API) - now connects to Ollama
       api = {
-        command = ["python" "-m" "flask" "run" "--host=0.0.0.0" "--port=5000"];
+        command = ["pip" "install" "-r" "requirements.txt" "&&" "python" "app.py"];
         manager = "process";
         env = {
             FLASK_APP = "app.py";
@@ -42,7 +43,7 @@
   workspace = {
     # Runs when a workspace is first created
     onCreate = {
-      "install-dependencies" = "npm install --prefix frontend && pip install -r requirements.txt";
+      "install-dependencies" = "npm install --prefix frontend";
     };
     # Runs when the workspace is (re)started
     onStart = {

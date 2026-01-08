@@ -18,7 +18,8 @@ function App() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
       const recognition = new SpeechRecognition();
-      recognition.continuous = true;
+      // Only listen continuously when in the immersive voice mode
+      recognition.continuous = isVoiceMode;
       recognition.interimResults = true;
       recognition.lang = 'en-US';
 
@@ -33,19 +34,22 @@ function App() {
         let finalTranscript = '';
 
         for (let i = event.resultIndex; i < event.results.length; ++i) {
-          if (event.results[i].isFinal) {
-            finalTranscript += event.results[i][0].transcript;
-          } else {
-            interimTranscript += event.results[i][0].transcript;
-          }
+            const transcriptPart = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+                finalTranscript += transcriptPart;
+            } else {
+                interimTranscript += transcriptPart;
+            }
         }
 
-        setTranscript(interimTranscript);
+        // Show the most up-to-date transcript, preferring the final one
+        setTranscript(finalTranscript || interimTranscript);
 
         if (finalTranscript) {
             if (isVoiceMode) {
                 sendMessage(finalTranscript.trim());
             } else {
+                // In standard mode, fill the input. Recognition will stop on its own.
                 setInput(finalTranscript.trim());
             }
         }
@@ -56,12 +60,13 @@ function App() {
       console.log("Speech recognition not supported in this browser.");
     }
 
+    // Cleanup function to stop recognition on component unmount or mode change
     return () => {
       if (recognitionRef.current) {
         recognitionRef.current.stop();
       }
     };
-  }, [isVoiceMode]);
+  }, [isVoiceMode]); // This dependency correctly re-initializes recognition when mode changes
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -132,16 +137,12 @@ function App() {
 
   const handleLiveSessionClick = () => {
     setIsVoiceMode(true);
-    if (recognitionRef.current) {
-      recognitionRef.current.start();
-    }
+    // The useEffect will handle starting the recognition in the correct mode
   };
 
   const closeVoiceMode = () => {
     setIsVoiceMode(false);
-    if (recognitionRef.current) {
-      recognitionRef.current.stop();
-    }
+    // The useEffect cleanup will handle stopping the recognition
   };
 
   return (
