@@ -6,3 +6,5 @@ ollama
 pyttsx3
 speechrecognition
 pyaudio
+Flask
+Flask-Cors

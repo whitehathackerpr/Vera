@@ -1,54 +1,52 @@
-# To learn more about how to use Nix to configure your environment
-# see: https://firebase.google.com/docs/studio/customize-workspace
 { pkgs, ... }: {
   # Which nixpkgs channel to use.
-  channel = "stable-24.05"; # or "unstable"
-
+  channel = "stable-23.11"; # Or "unstable"
   # Use https://search.nixos.org/packages to find packages
   packages = [
     pkgs.python311
-    pkgs.python311Packages.pip
-    pkgs.ollama
-    pkgs.espeak
-    pkgs.portaudio
+    pkgs.nodejs_20
+    (pkgs.python311.withPackages (ps: [
+      ps.flask
+    ]))
   ];
-
   # Sets environment variables in the workspace
   env = {};
-  idx = {
-    # Search for the extensions you want on https://open-vsx.org/ and use "publisher.id"
-    extensions = [
-      # "vscodevim.vim"
-    ];
+  # Search for the extensions you want on https://open-vsx.org/ and add them here
+  extensions = [
+    "ms-python.python"
+    "ms-python.debugpy"
+  ];
 
-    # Enable previews
+  # Enable previews
+  previews = {
+    enable = true;
     previews = {
-      enable = true;
-      previews = {
-        # web = {
-        #   # Example: run "npm run dev" with PORT set to IDX's defined port for previews,
-        #   # and show it in IDX's web preview panel
-        #   command = ["npm" "run" "dev"];
-        #   manager = "web";
-        #   env = {
-        #     # Environment variables to set for your server
-        #     PORT = "$PORT";
-        #   };
-        # };
+      # Frontend (React App)
+      web = {
+        command = ["npm" "run" "dev" "--" "--port" "$PORT"];
+        manager = "web";
+        cwd = "frontend"; # Run in the frontend directory
+      };
+      # Backend (Flask API)
+      api = {
+        command = ["python" "-m" "flask" "run" "--host=0.0.0.0" "--port=5000"];
+        manager = "process";
+        env = {
+            FLASK_APP = "app.py";
+        };
       };
     };
+  };
 
-    # Workspace lifecycle hooks
-    workspace = {
-      # Runs when a workspace is first created
-      onCreate = {
-        "install-dependencies" = "pip install -r requirements.txt";
-      };
-      # Runs when the workspace is (re)started
-      onStart = {
-        # Example: start a background task to watch and re-build backend code
-        # watch-backend = "npm run watch-backend";
-      };
+  # Workspace lifecycle hooks
+  workspace = {
+    # Runs when a workspace is first created
+    onCreate = {
+      "install-dependencies" = "npm install --prefix frontend && pip install -r requirements.txt";
+    };
+    # Runs when the workspace is (re)started
+    onStart = {
+      # The preview commands now handle starting the servers
     };
   };
 }
