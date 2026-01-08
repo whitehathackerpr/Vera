@@ -1,5 +1,7 @@
+# This file lists the Python packages that need to be installed for this project to run.
+# You can install all of these packages at once by running the following command:
+# pip install -r requirements.txt
+
 ollama
 pyttsx3
-SpeechRecognition
-PyAudio
-openwakeword
+speechrecognition
