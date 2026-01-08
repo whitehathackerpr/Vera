@@ -1,0 +1,5 @@
+ollama
+pyttsx3
+SpeechRecognition
+PyAudio
+openwakeword
